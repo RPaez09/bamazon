@@ -30,33 +30,41 @@ const parse = ( input ) => {
 };
 
 const logTable = ( products ) => {
-    console.log(`ID\t\|Name\t\t|Manufacturer\t|Department\t|Price\t\t|Number in stock`);
+    console.log(`\nID\t\|Name\t\t|Manufacturer\t|Department\t|Price\t\t|Number in stock`);
     for(let i = 0; i<products.length; i++){
         console.log(`${products[i].item_id}\t|${parse( products[i].product_name ) }\t|${parse(products[i].manufacturer_name)}\t|${parse(products[i].department_name)}\t|${parse(products[i].price)}\t|${parse(products[i].stock_quantity)}`);
     }
-}
+};
 
 const getAllProducts = () => {
-    connection.query("SELECT * FROM products", ( err, products ) => {
-        if( err ){
-            console.log( err );
-        }
-    
-        logTable(products);
-    });
-}
+    return new Promise( (resolve, reject) =>{
+        connection.query("SELECT * FROM products", ( err, products ) => {
+            if( err ){
+                reject( err );
+            }
+            resolve(products);
+        });
+    })
+};
 
 const getProductById = (id) => {
-    connection.query("SELECT * FROM products WHERE item_id = ?", [id], ( err, product ) => {
-        if( err ){
-            console.log( err );
-        }
+    return new Promise( (resolve, reject) => {
+        connection.query("SELECT * FROM products WHERE item_id = ?", [id], ( err, product ) => {
+            if( err ){
+                reject( err );
+            }
 
-        logTable(product);
+            if( product.length > 0 ){
+                resolve(product);
+            } else {
+                reject("Sorry, That product cannot be found.")
+            }
+        });
     });
 };
 
 module.exports = {
     getAllProducts: getAllProducts,
-    getProductById: getProductById
+    getProductById: getProductById,
+    logTable: logTable
 };
