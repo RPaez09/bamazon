@@ -63,8 +63,21 @@ const getProductById = (id) => {
     });
 };
 
+const processOrder = ( id, quantity) => {
+    return new Promise( (resolve, reject) => {
+        connection.query("UPDATE products SET stock_quantity = stock_quantity - ? WHERE item_id = ?", [ quantity, id ], ( err, product ) => {
+            if( err ){
+                reject( err );
+            }
+
+            resolve(product);
+        });
+    })
+};
+
 module.exports = {
     getAllProducts: getAllProducts,
     getProductById: getProductById,
+    processOrder: processOrder,
     logTable: logTable
 };
